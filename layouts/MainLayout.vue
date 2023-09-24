@@ -41,4 +41,8 @@
     </div>
 </template>
 
-<script setup></script>
+<script setup>
+// import state with pinia
+import { useUserStore } from '~/stores/user';
+const userStore = useUserStore()
+</script>
