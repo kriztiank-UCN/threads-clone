@@ -23,6 +23,7 @@
                     <Icon name="material-symbols:home-outline" size="35" color="#ffffff"/>
                 </button>
             <!-- EDIT BUTTON -->
+           <!-- OPEN MENU OVERLAY -->
                 <button 
                     @click="userStore.isMenuOverlay = true"
                     class="w-full h-full"
