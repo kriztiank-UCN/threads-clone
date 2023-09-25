@@ -14,9 +14,9 @@
       <div id="Post" class="z-40 bottom-0 max-h-[100vh-200px] w-full px-3 max-w-[500px] mx-auto">
         <div class="py-2 w-full">
           <div class="flex items-center">
-            <div class="flex items-center text-white">
-              <img class="rounded-full h-[35px]" src="https://picsum.photos/id/223/50" />
-              <div class="ml-2 font-semibold text-[18px]">John Doe</div>
+            <div v-if="user" class="flex items-center text-white">
+              <img class="rounded-full h-[35px]" :src="user.identities[0].identity_data.avatar_url" />
+              <div class="ml-2 font-semibold text-[18px]">{{ user.identities[0].identity_data.full_name }}</div>
             </div>
           </div>
           <!-- DYNAMIC TEXTAREA -->
@@ -84,8 +84,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { useUserStore } from '~/stores/user'
 const userStore = useUserStore()
 
-// const client = useSupabaseClient()
-// const user = useSupabaseUser()
+const client = useSupabaseClient()
+const user = useSupabaseUser()
 
 let text = ref(null)
 let isLoading = ref(false)
