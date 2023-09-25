@@ -1,4 +1,6 @@
 <template>
+  <VitePwaManifest />
+
   <div class="bg-black fixed w-[calc(100%+1px)] h-full">
     <NuxtPage />
     <!-- import CreatePost from '~/components/CreatePost.vue' -->

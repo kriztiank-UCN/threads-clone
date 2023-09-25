@@ -13,7 +13,7 @@
           <!-- if there is posts, loop through them -->
           <div v-if="isPosts" v-for="post in posts" :key="post">
             <!-- post has a prop which is post and we're going to emit out of this so when one is deleted we update the post -->
-            <Post :post="post" @isDeleted="posts = []" />
+            <Post :post="post" @isDeleted="posts = userStore.getAllPosts()" />
           </div>
 
           <div v-else>
@@ -35,7 +35,7 @@
           </div>
 
           <!-- SELFCLOSING SPACER -->
-          <!-- <div class="mt-60" /> -->
+          <div class="mt-60" />
         </div>
       </div>
     </div>
@@ -55,10 +55,11 @@ let isPosts = ref(false)
 let isLoading = ref(false)
 
 watchEffect(() => {
-    if (!user.value) {
-        return navigateTo('/auth')
-    }
+  if (!user.value) {
+    return navigateTo('/auth')
+  }
 })
+
 
 // MOCK DATA
 // onBeforeMount(() => {
@@ -76,32 +77,40 @@ watchEffect(() => {
 
 // fetch all posts from pinia stores/user.js getAllPosts
 onBeforeMount(async () => {
-    try {
-        isLoading.value = true
-        await userStore.getAllPosts()
-        isLoading.value = false
-    } catch (error) {
-        console.log(error)
-    }
+  try {
+    isLoading.value = true
+    await userStore.getAllPosts()
+    isLoading.value = false
+  } catch (error) {
+    console.log(error)
+  }
 })
 // watch for changes in posts, let posts = ref([])
 onMounted(() => {
-    watchEffect(() => {
-        if (userStore.posts && userStore.posts.length >= 1) {
-            posts.value = userStore.posts
-            isPosts.value = true
-        }
-    })
+  watchEffect(() => {
+    posts.value = userStore.posts
+    if (userStore.posts && userStore.posts.length >= 1) {
+      isPosts.value = true
+    } else {
+      isPosts.value = false
+    }
+  })
 })
 // a single watch to watch for changes, sometimes
-// on mobile the pwa can be a bit funny loading 
+// on mobile the pwa can be a bit funny loading
 // so this is kind of a fallback function.
-// deep is watching inside of the object to see if anything changes 
+// deep is watching inside of the object to see if anything changes
 // then when something changes it re-gets all of the posts
-watch(() => posts.value, () => {
+watch(
+  () => posts.value,
+  () => {
+    posts.value = userStore.posts
     if (userStore.posts && userStore.posts.length >= 1) {
-        posts.value = userStore.posts
-        isPosts.value = true
+      isPosts.value = true
+    } else {
+      isPosts.value = false
     }
-}, { deep: true })
+  },
+  { deep: true }
+)
 </script>

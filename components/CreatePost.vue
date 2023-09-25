@@ -128,7 +128,7 @@ const createPost = async () => {
   // if we have a file we want to upload it to supabase storage
   if (fileData.value) {
     const { data, error } = await client.storage
-      .from('threads-clone-files')
+      .from('threads-clone-files-')
       .upload(`${uuidv4()}.jpg`, fileData.value)
 
     dataOut = data

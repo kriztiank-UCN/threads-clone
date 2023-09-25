@@ -56,6 +56,8 @@
 
           <div class="absolute mt-2 w-full ml-2">
             <button :disabled="isLike" @click="likesFunc()" class="flex items-center gap-1">
+              <!-- v-if="!hasLikedComputed" show empty heart
+                   v-else show full red heart -->
               <Icon
                 v-if="!hasLikedComputed"
                 class="p-1 text-white hover:bg-gray-800 rounded-full cursor-pointer"
@@ -70,19 +72,15 @@
               />
             </button>
             <div class="relative text-sm text-gray-500">
-              <!-- TEMP -->
               <div>
-                <span>4</span>
+                <!-- show how many likes for this post -->
+                <span v-if="!isLike">{{ post.likes.length }}</span>
+                <!-- if isLike is true show loading icon -->
+                <span v-else>
+                  <Icon name="eos-icons:bubble-loading" color="#ffffff" size="13" />
+                </span>
                 likes
               </div>
-              <!-- TEMP -->
-              <!-- <div> 
-                              <span v-if="!isLike">{{ post.likes.length }}</span>
-                              <span v-else>
-                                  <Icon name="eos-icons:bubble-loading" color="#ffffff" size="13"/>
-                              </span>
-                              likes
-                          </div> -->
             </div>
           </div>
         </div>
@@ -124,4 +122,106 @@ const props = defineProps({ post: Object })
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
+
+// LIKES #1
+const hasLikedComputed = computed(() => {
+  // if there's no user just return just exit
+  if (!user.value) return
+  let res = false
+  // Loop through our props so the post object
+  // we Loop through the likes inside the post
+  /* because a post has multiple likes, it's a one-to-many relationship
+     so get each individual like and if the like.userId == is equal to the logged in user
+     and postId equals the postId being passed as a prop we want to set this to
+    true and then we just return the result which is either true or false */
+  props.post.likes.forEach(like => {
+    if (like.userId == user.value.identities[0].user_id && like.postId == props.post.id) {
+      res = true
+    }
+  })
+
+  return res
+})
+
+const deletePost = async (id, picture) => {
+  let res = confirm('Are you sure you want to delete this post?')
+  // if it's false we just want to exit this function
+  if (!res) return
+  // if not we want to try to delete the post
+  try {
+    isMenu.value = false
+    isDeleting.value = true
+    const { data, error } = await client.storage.from('threads-clone-files-').remove([picture])
+
+    await useFetch(`/api/delete-post/${id}`, { method: 'DELETE' })
+    emit('isDeleted', true)
+
+    isDeleting.value = false
+  } catch (error) {
+    console.log(error)
+    isDeleting.value = false
+  }
+}
+
+const likePost = async id => {
+  isLike.value = true
+  try {
+    await useFetch(`/api/like-post/`, {
+      method: 'POST',
+      body: {
+        userId: user.value.identities[0].user_id,
+        postId: id,
+      },
+    })
+    await userStore.getAllPosts()
+    isLike.value = false
+  } catch (error) {
+    console.log(error)
+    isLike.value = false
+  }
+}
+
+const unlikePost = async id => {
+  isLike.value = true
+  try {
+    await useFetch(`/api/unlike-post/${id}`, { method: 'DELETE' })
+    await userStore.getAllPosts()
+    isLike.value = false
+  } catch (error) {
+    console.log(error)
+    isLike.value = false
+  }
+}
+// TODO
+/* this is where
+we figure out if we're liking or unliking a post first we're going to say let like post object equals null and the
+first thing we're going to say is if props post likes length is less than one
+we obviously want it to be alike because there is no likes on it at all so we're going to call this like post and then
+after that we're going to say else and then we've got a bit of a loop in there so we're going to grab our props post
+likes for each and we can open that up we're going to say like open it and then
+inside this we're going to say if like user ID equals your user ID and the post
+ID equals the post ID being passed in we're going to assign that like to this variable that we've set up here and and
+then finally after this else we're going to say if the like post object has something in it we want to unlike and
+then we have this return null to exit the function but if this is not true we're gonna like the post and that is it */
+const likesFunc = () => {
+  let likePostObj = null
+
+  if (props.post.likes.length < 1) {
+    likePost(props.post.id)
+    return null
+  } else {
+    props.post.likes.forEach(like => {
+      if (like.userId == user.value.identities[0].user_id && like.postId == props.post.id) {
+        likePostObj = like
+      }
+    })
+  }
+
+  if (likePostObj) {
+    unlikePost(likePostObj.id)
+    return null
+  }
+
+  likePost(props.post.id)
+}
 </script>
