@@ -1,11 +1,12 @@
 <template>
   <MainLayout>
+    <!-- <div class="text-white">{{ user }}</div> -->
+
     <div id="IndexPage" class="w-full overflow-auto">
       <div class="mx-auto max-w-[500px] overflow-hidden">
         <div id="Posts" class="px-4 max-w-[600px] mx-auto">
-
-         <!-- LOCAL DATA TEST - if there is posts, loop through them -->
-         <!-- <div class="text-white" v-if="isPosts" v-for="post in posts" :key="post">
+          <!-- LOCAL DATA TEST - if there is posts, loop through them -->
+          <!-- <div class="text-white" v-if="isPosts" v-for="post in posts" :key="post">
             {{ post }}
           </div> -->
 
@@ -46,11 +47,17 @@ import MainLayout from '~/layouts/MainLayout.vue'
 import { useUserStore } from '~/stores/user'
 const userStore = useUserStore()
 // import supabase
-// const user = useSupabaseUser()
+const user = useSupabaseUser()
 
 let posts = ref([])
 let isPosts = ref(true)
 let isLoading = ref(false)
+
+// watchEffect(() => {
+//     if (!user.value) {
+//         return navigateTo('/auth')
+//     }
+// })
 
 onBeforeMount(() => {
   posts.value = [
