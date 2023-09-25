@@ -1,14 +1,47 @@
 CREATE PROJECT
 npx nuxi@latest init threads-clone
 
+NPM PACKAGES: 
+npm i @nuxtjs/supabase @nuxtjs/tailwindcss @pinia/nuxt @prisma/client @vite-pwa/nuxt nuxt-icon prisma uuid 
+npm i pinia -f
+
 SUPABASE:
 project password: thisisatest123!
+
+SUPABASE_URL=""
+SUPABASE_KEY=""
+BUCKET_URL=""
+
+GITHUB PROVIDER:
+https://github.com/settings/developers
 
 PRISMA:
 npx prisma init
 npx prisma generate
 npx prisma migrate dev --name init
 
-NPM PACKAGES: 
-npm i @nuxtjs/supabase @nuxtjs/tailwindcss @pinia/nuxt @prisma/client @vite-pwa/nuxt nuxt-icon prisma uuid 
-npm i pinia -f
+1. Set the DATABASE_URL in the .env file to point to your existing database. If your database has no tables yet, read https://pris.ly/d/getting-started
+2. Set the provider of the datasource block in schema.prisma to match your database: postgresql, mysql, sqlite, sqlserver, mongodb or cockroachdb.     
+3. Run prisma db pull to turn your database schema into a Prisma schema.
+4. Run prisma generate to generate the Prisma Client. You can then start querying your database.
+
+The database has two tables the first one is
+model Posts: we have an: 
+id - which is auto increment
+userId - with a uuid 
+name 
+image 
+text 
+picture  - the picture is like a long string of characters 
+createdAt - which is the date 
+likes - which is a one-to-many relationship 
+
+The second one is:
+model Likes:
+id - which is auto increment
+userId - with a uuid 
+postId - because like or likes are associated with a certain postId  
+createdAt - which is the date 
+post - which defines the relationship, postId and id are related, when you
+delete the post it also Cascades and deletes all of the likes associated with
+that post
